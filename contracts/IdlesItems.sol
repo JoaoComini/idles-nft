@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract IdlesItems is ERC721, Ownable {
-    constructor() ERC721("Idles", "IDLE") {}
+    constructor() ERC721("Idles", "IDLE") { }
 
     uint8 constant public SUPPLY_ID_BITS = 216;
     uint40 constant public MAX_ITEM_ID = type(uint40).max;
@@ -25,7 +25,24 @@ contract IdlesItems is ERC721, Ownable {
 
     Item[] public items;
 
-    function addItems(Item[] memory _items) public onlyOwner {
+    mapping(address => bool) minters;
+
+    modifier onlyMintersOrOwner() {
+        require(minters[_msgSender()] || owner() == _msgSender());
+        _;
+    }
+
+    function addMinters(address[] calldata _minters) external onlyOwner {
+        for (uint256 i = 0; i < _minters.length; i++) {
+            address minter = _minters[i];
+
+            require(minters[minter] != true);
+
+            minters[minter] = true;
+        }
+    }
+
+    function addItems(Item[] calldata _items) external onlyOwner {
         require(_items.length > 0);
 
         for (uint256 i = 0; i < _items.length; i++) {
@@ -38,7 +55,7 @@ contract IdlesItems is ERC721, Ownable {
         }
     }
 
-    function mintToken(address _beneficiary, uint256 _itemId) public onlyOwner returns (uint256) {
+    function mintToken(address _beneficiary, uint256 _itemId) public onlyMintersOrOwner returns (uint256) {
         require(_itemId < items.length);
 
         Item storage item = items[_itemId];
@@ -48,7 +65,7 @@ contract IdlesItems is ERC721, Ownable {
 
         item.supply = newSupply;
 
-        super._mint(_beneficiary, tokenId);
+        super._safeMint(_beneficiary, tokenId);
 
         return tokenId;
     }

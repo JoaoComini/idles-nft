@@ -7,7 +7,7 @@ const {
 const ETH_PUBLIC_ADDRESS = process.env.ETH_PUBLIC_ADDRESS
 
 const contract = require("../artifacts/contracts/Store.sol/Store.json")
-const contractAddress = "0x162d6963Afbd280B644a0932BADC5338B2118DC7"
+const contractAddress = "0x9b39eEA144b572a9eDfB31f787B51e6aed67a6cd"
 
 const contractAbi = getContract(contract.abi, contractAddress)
 

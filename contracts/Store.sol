@@ -16,8 +16,9 @@ contract Store is Ownable {
     IdlesToken private token;
     IdlesItems private items;
 
-    constructor(address _tokenAddress) {
+    constructor(address _tokenAddress, address _itemsAddress) {
         token = IdlesToken(_tokenAddress);
+        items = IdlesItems(_itemsAddress);
     }
     
     function buyChest() public {
