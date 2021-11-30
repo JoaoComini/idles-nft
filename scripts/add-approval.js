@@ -7,8 +7,8 @@ const {
 const ETH_PUBLIC_ADDRESS = process.env.ETH_PUBLIC_ADDRESS
 
 const contract = require("../artifacts/contracts/IdlesToken.sol/IdlesToken.json")
-const contractAddress = "0x1e5e591C12192d7cca7A1B7F69730b4D133337d0"
-const storeContractAddress = "0x9b39eEA144b572a9eDfB31f787B51e6aed67a6cd"
+const contractAddress = "0xA23CcB16C074bAdA6e52B9a86a6c66C4f709A8d5"
+const storeContractAddress = "0x853CaA85da459dab4688467F2685ebB555C516e8"
 
 const contractAbi = getContract(contract.abi, contractAddress)
 

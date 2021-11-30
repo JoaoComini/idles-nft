@@ -6,19 +6,31 @@ const {
 
 const ETH_PUBLIC_ADDRESS = process.env.ETH_PUBLIC_ADDRESS
 
-const contract = require("../artifacts/contracts/IdlesItems.sol/IdlesItems.json")
-const contractAddress = "0x97420DA211D3889AC2AF9D6f65eCCe17d659d972"
+const contract = require("../artifacts/contracts/ItemsCollection.sol/ItemsCollection.json")
+const contractAddress = "0xfa4A9FEF3E0a198c8AAa1B9d3a7AAF77378021F0"
 
 const contractAbi = getContract(contract.abi, contractAddress)
 
 const items = [
     {
-        name: "Great Sword",
-        description: "A great sword.",
-        slot: "2h",
         rarity: 0,
-        supply: 0,
-        attributes: "dmg:10|atkspeed:1"
+        metadata: "a url",
+    },
+    {
+        rarity: 1,
+        metadata: "a url",
+    },
+    {
+        rarity: 2,
+        metadata: "a url",
+    },
+    {
+        rarity: 3,
+        metadata: "a url",
+    },
+    {
+        rarity: 4,
+        metadata: "a url",
     }
 ]
 

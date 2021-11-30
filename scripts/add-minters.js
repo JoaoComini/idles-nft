@@ -6,9 +6,9 @@ const {
 
 const ETH_PUBLIC_ADDRESS = process.env.ETH_PUBLIC_ADDRESS
 
-const contract = require("../artifacts/contracts/IdlesItems.sol/IdlesItems.json")
-const contractAddress = "0x97420DA211D3889AC2AF9D6f65eCCe17d659d972"
-const storeContractAddress = "0x9b39eEA144b572a9eDfB31f787B51e6aed67a6cd"
+const contract = require("../artifacts/contracts/ItemsCollection.sol/ItemsCollection.json")
+const contractAddress = "0xfa4A9FEF3E0a198c8AAa1B9d3a7AAF77378021F0"
+const chestContractAddress = "0x464b80d187ABe36E82f12697126a18f33384C2fF"
 
 const contractAbi = getContract(contract.abi, contractAddress)
 
@@ -20,7 +20,7 @@ async function addMinters() {
         to: contractAddress,
         nonce: nonce,
         gas: 500000,
-        data: contractAbi.methods.addMinters([storeContractAddress]).encodeABI(),
+        data: contractAbi.methods.addMinters([chestContractAddress]).encodeABI(),
     }
 
     await signAndSendTransaction(transaction)

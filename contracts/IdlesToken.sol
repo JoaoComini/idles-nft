@@ -8,6 +8,6 @@ contract IdlesToken is ERC20 {
     uint256 constant public TOTAL_SUPPLY = 10 ** (9 + 18);
 
     constructor() ERC20("Idles Token", "IDLE") {
-        _mint(msg.sender, TOTAL_SUPPLY);
+        _mint(_msgSender(), TOTAL_SUPPLY);
     }
 }
