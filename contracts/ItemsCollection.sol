@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 contract ItemsCollection is ERC721, Ownable {
     using Address for address;
 
-    constructor() ERC721("Idles", "IDLE") { }
+    constructor() ERC721("Idles", "IDLE") {}
 
     struct ItemParam {
         uint256 rarity;
@@ -25,7 +25,7 @@ contract ItemsCollection is ERC721, Ownable {
     event MinterAdded(address minter);
     event ItemAdded(uint256 itemId, uint256 rarity, string metadata);
     event ItemMinted(address beneficiary, uint256 itemId, uint256 newSupply);
-    
+
     uint8 public constant SUPPLY_ID_BITS = 216;
     uint40 public constant MAX_ITEM_ID = type(uint40).max;
     uint216 public constant MAX_TOKEN_ID = type(uint216).max;
@@ -113,4 +113,6 @@ contract ItemsCollection is ERC721, Ownable {
     function getRarityForItem(uint256 _itemId) external view returns (uint256) {
         return items[_itemId].rarity;
     }
+
+    //TODO: Override tokenURI method
 }

@@ -11,7 +11,7 @@ import "./ChestCollection.sol";
 contract Store is Ownable {
     using Address for address;
 
-    uint256 constant public CHEST_VALUE = 50 * 10 ** 18;
+    uint256 public constant CHEST_VALUE = 50 * 10**18;
 
     IdlesToken private token;
     ChestCollection private chest;
@@ -20,7 +20,7 @@ contract Store is Ownable {
         token = IdlesToken(_tokenAddress);
         chest = ChestCollection(_chestAddress);
     }
-    
+
     function buyChest(uint256 _chestId) external {
         address sender = _msgSender();
 

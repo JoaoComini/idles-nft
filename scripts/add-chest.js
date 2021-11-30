@@ -6,12 +6,19 @@ const {
 
 const ETH_PUBLIC_ADDRESS = process.env.ETH_PUBLIC_ADDRESS
 
-const contract = require("../artifacts/contracts/Store.sol/Store.json")
-const contractAddress = "0x853CaA85da459dab4688467F2685ebB555C516e8"
+const contract = require("../artifacts/contracts/ChestCollection.sol/ChestCollection.json")
+const contractAddress = "0x464b80d187ABe36E82f12697126a18f33384C2fF"
 
 const contractAbi = getContract(contract.abi, contractAddress)
 
-async function buyChest() {
+const chests = [
+    {
+        name: "Chest",
+        rarityWeights: [1000, 300, 100, 50, 1]
+    }
+]
+
+async function addChests() {
     const nonce = await getTransactionCount();
 
     const transaction = {
@@ -19,10 +26,10 @@ async function buyChest() {
         to: contractAddress,
         nonce: nonce,
         gas: 500000,
-        data: contractAbi.methods.buyChest(0).encodeABI(),
+        data: contractAbi.methods.addChests(chests).encodeABI(),
     }
 
     await signAndSendTransaction(transaction)
 }
 
-buyChest()
+addChests()

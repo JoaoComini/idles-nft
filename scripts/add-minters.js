@@ -1,7 +1,7 @@
-const { 
+const {
     getContract,
     getTransactionCount,
-    signAndSendTransaction 
+    signAndSendTransaction
 } = require("./utils/web3")
 
 const ETH_PUBLIC_ADDRESS = process.env.ETH_PUBLIC_ADDRESS
