@@ -9,95 +9,91 @@ import "./ItemsCollection.sol";
 contract ChestCollection {
     using Address for address;
 
-    struct ChestParam {
-        string name;
-        uint256[] rarityWeights;
-    }
-
-    struct ItemWeightRange {
-        uint256 from;
-        uint256 to;
-    }
-
-    struct Chest {
-        string name;
-        uint256 totalWeight;
-    }
-
     event ChestAdded(uint256 chestId, string name, uint256 totalWeight);
-    event ItemRangeSet(
-        uint256 chestId,
-        uint256 itemId,
-        uint256 from,
-        uint256 to
-    );
     event ChestOpened(address opener, uint256 chestId, uint256 itemId);
 
-    Chest[] private chests;
-    mapping(uint256 => ItemWeightRange[]) chestItemWeightRanges;
+    string[] chestsName;
+    uint256[] chestsTotalWeight;
+    mapping(uint256 => uint256[]) chestItemWeightRangeStart;
+    mapping(uint256 => uint256[]) chestItemWeightRangeEnd;
 
-    ItemsCollection private items;
+    ItemsCollection private itemsCollection;
 
     constructor(address _itemsAddress) {
-        items = ItemsCollection(_itemsAddress);
+        itemsCollection = ItemsCollection(_itemsAddress);
     }
 
-    function addChests(ChestParam[] memory _chests) external {
-        for (uint256 i = 0; i < _chests.length; i++) {
-            ChestParam memory param = _chests[i];
+    function addChests(
+        string[] memory _chestsName,
+        uint256[][] memory _chestsRarityWeights
+    ) external {
+        require(
+            _chestsName.length > 0,
+            "addChests: names length should be greater than 0"
+        );
+        require(
+            _chestsRarityWeights.length > 0,
+            "addChests: rarity weights length should be greater than 0"
+        );
+        require(
+            _chestsName.length == _chestsRarityWeights.length,
+            "addChests: names and rarity weights should have the same length"
+        );
 
-            uint256 totalWeight = calculateTotalWeight(param, chests.length);
+        for (uint256 i = 0; i < _chestsName.length; i++) {
+            string memory name = _chestsName[i];
+            uint256[] memory rarityWeights = _chestsRarityWeights[i];
 
-            chests.push(Chest({name: param.name, totalWeight: totalWeight}));
+            uint256 chestId = chestsName.length;
 
-            emit ChestAdded(chests.length - 1, param.name, totalWeight);
+            uint256 totalWeight = calculateWeights(rarityWeights, chestId);
+
+            chestsName.push(name);
+            chestsTotalWeight.push(totalWeight);
+
+            emit ChestAdded(chestId, name, totalWeight);
         }
     }
 
-    // TODO: Optimize this function to use less gas
-    function calculateTotalWeight(ChestParam memory _chest, uint256 _chestId)
+    function calculateWeights(uint256[] memory _rarityWeights, uint256 _chestId)
         private
         returns (uint256)
     {
         require(
-            _chest.rarityWeights.length == 5,
-            "calculateTotalWeight: invalid rarityWeights"
+            _rarityWeights.length == 5,
+            "calculateTotalWeight: invalid rarity weights, it should have a length of 5"
         );
 
-        uint256 itemCount = items.getItemCount();
         uint256 totalWeight = 0;
 
-        for (uint256 i = 0; i < itemCount; i++) {
-            uint256 rarity = items.getRarityForItem(i);
+        uint256[] memory itemsRarity = itemsCollection.getItemsRarity();
+
+        for (uint256 i = 0; i < itemsRarity.length; i++) {
+            uint256 rarity = itemsRarity[i];
 
             uint256 totalWeightBefore = totalWeight;
-            totalWeight += _chest.rarityWeights[rarity];
+            totalWeight += _rarityWeights[rarity];
 
-            chestItemWeightRanges[_chestId].push(
-                ItemWeightRange({from: totalWeightBefore, to: totalWeight - 1})
-            );
-
-            emit ItemRangeSet(_chestId, i, totalWeightBefore, totalWeight);
+            chestItemWeightRangeStart[_chestId].push(totalWeightBefore);
+            chestItemWeightRangeEnd[_chestId].push(totalWeight - 1);
         }
 
         return totalWeight;
     }
 
     function openFor(address _opener, uint256 _chestId) external {
-        require(_chestId < chests.length, "openFor: chest doens't exists");
+        require(_chestId < chestsName.length, "openFor: chest doens't exists");
 
-        Chest memory chest = chests[_chestId];
+        uint256 random = randomNumber() % chestsTotalWeight[_chestId];
 
-        uint256 random = randomNumber() % chest.totalWeight;
+        uint256[] memory rangeStart = chestItemWeightRangeStart[_chestId];
+        uint256[] memory rangeEnd = chestItemWeightRangeEnd[_chestId];
 
-        ItemWeightRange[] memory ranges = chestItemWeightRanges[_chestId];
-
-        for (uint256 i = 0; i < ranges.length; i++) {
-            if (random >= ranges[i].from && random <= ranges[i].to) {
-                items.mintItem(_opener, i);
+        for (uint256 i = 0; i < rangeStart.length; i++) {
+            if (random >= rangeStart[i] && random <= rangeEnd[i]) {
+                itemsCollection.mintItem(_opener, i);
 
                 emit ChestOpened(_opener, _chestId, i);
-
                 return;
             }
         }

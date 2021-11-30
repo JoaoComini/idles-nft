@@ -24,7 +24,7 @@ contract Store is Ownable {
     function buyChest(uint256 _chestId) external {
         address sender = _msgSender();
 
-        require(token.balanceOf(sender) >= CHEST_VALUE);
+        require(token.balanceOf(sender) >= CHEST_VALUE, "buyChest: sender doesn't have enough tokens");
 
         token.transferFrom(sender, owner(), CHEST_VALUE);
 

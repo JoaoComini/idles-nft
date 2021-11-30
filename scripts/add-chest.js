@@ -4,18 +4,18 @@ const {
     signAndSendTransaction
 } = require("./utils/web3")
 
+const {
+    CHEST_COLLECTION_ADDRESS
+} = require("./utils/addresses")
+
 const ETH_PUBLIC_ADDRESS = process.env.ETH_PUBLIC_ADDRESS
 
 const contract = require("../artifacts/contracts/ChestCollection.sol/ChestCollection.json")
-const contractAddress = "0x464b80d187ABe36E82f12697126a18f33384C2fF"
+const contractAbi = getContract(contract.abi, CHEST_COLLECTION_ADDRESS)
 
-const contractAbi = getContract(contract.abi, contractAddress)
-
-const chests = [
-    {
-        name: "Chest",
-        rarityWeights: [1000, 300, 100, 50, 1]
-    }
+const chestNames = ["Common"]
+const chestRarityWeights = [
+    [1000, 300, 100, 50, 1]
 ]
 
 async function addChests() {
@@ -23,10 +23,10 @@ async function addChests() {
 
     const transaction = {
         from: ETH_PUBLIC_ADDRESS,
-        to: contractAddress,
+        to: CHEST_COLLECTION_ADDRESS,
         nonce: nonce,
         gas: 500000,
-        data: contractAbi.methods.addChests(chests).encodeABI(),
+        data: contractAbi.methods.addChests(chestNames, chestRarityWeights).encodeABI(),
     }
 
     await signAndSendTransaction(transaction)

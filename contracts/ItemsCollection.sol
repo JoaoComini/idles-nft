@@ -9,20 +9,6 @@ import "@openzeppelin/contracts/utils/Address.sol";
 contract ItemsCollection is ERC721, Ownable {
     using Address for address;
 
-    constructor() ERC721("Idles", "IDLE") {}
-
-    struct ItemParam {
-        uint256 rarity;
-        string metadata;
-    }
-
-    struct Item {
-        uint256 rarity;
-        uint256 supply;
-        string metadata;
-    }
-
-    event MinterAdded(address minter);
     event ItemAdded(uint256 itemId, uint256 rarity, string metadata);
     event ItemMinted(address beneficiary, uint256 itemId, uint256 newSupply);
 
@@ -30,61 +16,60 @@ contract ItemsCollection is ERC721, Ownable {
     uint40 public constant MAX_ITEM_ID = type(uint40).max;
     uint216 public constant MAX_TOKEN_ID = type(uint216).max;
 
-    Item[] private items;
+    uint256[] itemsRarity;
+    uint256[] itemsSupply;
+    string[] itemsMetadata;
 
     mapping(address => bool) minters;
 
-    modifier onlyMintersOrOwner() {
-        require(minters[_msgSender()] || owner() == _msgSender());
+    constructor() ERC721("Idles", "IDLE") { }
+
+    modifier onlyMinters() {
+        require(minters[_msgSender()]);
         _;
     }
 
-    function addMinters(address[] calldata _minters) external onlyOwner {
+    function addMinters(address[] memory _minters) external onlyOwner {
         for (uint256 i = 0; i < _minters.length; i++) {
             address minter = _minters[i];
-
-            require(minters[minter] != true);
-
             minters[minter] = true;
-
-            emit MinterAdded(minter);
         }
     }
 
-    function addItems(ItemParam[] calldata _items) external onlyOwner {
-        require(_items.length > 0);
+    function addItems(uint256[] memory _itemsRarity, string[] memory _itemsMetadata) external onlyOwner {
+        require(_itemsRarity.length > 0, "addItems: rarities length should be greater than 0");
+        require(_itemsMetadata.length > 0, "addItems: tokenURIs length should be greater than 0");
+        require(_itemsRarity.length == _itemsMetadata.length, "addItems: rarities and tokenURIs should have the same length");
 
-        for (uint256 i = 0; i < _items.length; i++) {
-            ItemParam memory param = _items[i];
+        for (uint256 i = 0; i < _itemsRarity.length; i++) {
+            uint256 rarity = _itemsRarity[i];
+            string memory metadata = _itemsMetadata[i];
 
-            require(bytes(param.metadata).length > 0);
-            require(param.rarity >= 0 && param.rarity <= 4);
+            require(rarity >= 0 && rarity <= 4, "addItems: invalidy rarity, it should be between 0 and 4, inclusive");
+            require(bytes(metadata).length > 0);
 
-            items.push(
-                Item({
-                    rarity: param.rarity,
-                    supply: 0,
-                    metadata: param.metadata
-                })
-            );
+            uint256 itemId = itemsRarity.length;
 
-            emit ItemAdded(items.length - 1, param.rarity, param.metadata);
+            itemsRarity.push(rarity);
+            itemsSupply.push(0);
+            itemsMetadata.push(metadata);
+
+            emit ItemAdded(itemId, rarity, metadata);
         }
     }
 
     function mintItem(address _beneficiary, uint256 _itemId)
         public
-        onlyMintersOrOwner
+        onlyMinters
         returns (uint256)
     {
-        require(_itemId < items.length, "mintToken: item doesn't exists");
+        require(_itemId < itemsSupply.length, "mintToken: item doesn't exists");
 
-        Item storage item = items[_itemId];
-        uint256 newSupply = item.supply + 1;
+        uint256 newSupply = itemsSupply[_itemId] + 1;
 
         uint256 tokenId = encodeTokenId(_itemId, newSupply);
 
-        item.supply = newSupply;
+        itemsSupply[_itemId] = newSupply;
 
         super._safeMint(_beneficiary, tokenId);
 
@@ -106,12 +91,8 @@ contract ItemsCollection is ERC721, Ownable {
         }
     }
 
-    function getItemCount() external view returns (uint256) {
-        return items.length;
-    }
-
-    function getRarityForItem(uint256 _itemId) external view returns (uint256) {
-        return items[_itemId].rarity;
+    function getItemsRarity() external view returns (uint256[] memory) {
+        return itemsRarity;
     }
 
     //TODO: Override tokenURI method

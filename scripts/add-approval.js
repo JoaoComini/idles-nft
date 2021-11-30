@@ -4,13 +4,16 @@ const {
     signAndSendTransaction
 } = require("./utils/web3")
 
+const {
+    IDLE_TOKEN_ADDRESS,
+    STORE_ADDRESS
+} = require("./utils/addresses")
+
 const ETH_PUBLIC_ADDRESS = process.env.ETH_PUBLIC_ADDRESS
 
 const contract = require("../artifacts/contracts/IdlesToken.sol/IdlesToken.json")
-const contractAddress = "0xA23CcB16C074bAdA6e52B9a86a6c66C4f709A8d5"
-const storeContractAddress = "0x853CaA85da459dab4688467F2685ebB555C516e8"
 
-const contractAbi = getContract(contract.abi, contractAddress)
+const contractAbi = getContract(contract.abi, IDLE_TOKEN_ADDRESS)
 
 async function addApproval() {
     const nonce = await getTransactionCount();
@@ -19,10 +22,10 @@ async function addApproval() {
 
     const transaction = {
         from: ETH_PUBLIC_ADDRESS,
-        to: contractAddress,
+        to: IDLE_TOKEN_ADDRESS,
         nonce: nonce,
         gas: 500000,
-        data: contractAbi.methods.approve(storeContractAddress, approvalAmount).encodeABI(),
+        data: contractAbi.methods.approve(STORE_ADDRESS, approvalAmount).encodeABI(),
     }
 
     await signAndSendTransaction(transaction)
