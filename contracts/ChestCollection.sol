@@ -3,14 +3,14 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./ItemsCollection.sol";
 
-contract ChestCollection {
+contract ChestCollection is Ownable {
     using Address for address;
 
     event ChestAdded(uint256 chestId, string name, uint256 totalWeight);
-    event ChestOpened(address opener, uint256 chestId, uint256 itemId);
 
     string[] chestsName;
     uint256[] chestsTotalWeight;
@@ -26,7 +26,7 @@ contract ChestCollection {
     function addChests(
         string[] memory _chestsName,
         uint256[][] memory _chestsRarityWeights
-    ) external {
+    ) external onlyOwner {
         require(
             _chestsName.length > 0,
             "addChests: names length should be greater than 0"
@@ -66,10 +66,10 @@ contract ChestCollection {
 
         uint256 totalWeight = 0;
 
-        uint256[] memory itemsRarity = itemsCollection.getItemsRarity();
+        uint8[] memory itemsRarity = itemsCollection.getItemsRarity();
 
         for (uint256 i = 0; i < itemsRarity.length; i++) {
-            uint256 rarity = itemsRarity[i];
+            uint8 rarity = itemsRarity[i];
 
             uint256 totalWeightBefore = totalWeight;
             totalWeight += _rarityWeights[rarity];
@@ -81,7 +81,7 @@ contract ChestCollection {
         return totalWeight;
     }
 
-    function openFor(address _opener, uint256 _chestId) external {
+    function open(uint256 _chestId) external view returns (uint256) {
         require(_chestId < chestsName.length, "openFor: chest doens't exists");
 
         uint256 random = randomNumber() % chestsTotalWeight[_chestId];
@@ -91,16 +91,15 @@ contract ChestCollection {
 
         for (uint256 i = 0; i < rangeStart.length; i++) {
             if (random >= rangeStart[i] && random <= rangeEnd[i]) {
-                itemsCollection.mintItem(_opener, i);
-
-                emit ChestOpened(_opener, _chestId, i);
-                return;
+                return i;
             }
         }
+
+        revert("open: couldn't find an item on this chest");
     }
 
     // TODO: Substitute for a real random function (prob ChainLink)
     function randomNumber() private pure returns (uint256) {
-        return 1450;
+        return 1400;
     }
 }

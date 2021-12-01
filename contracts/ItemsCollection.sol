@@ -16,7 +16,7 @@ contract ItemsCollection is ERC721, Ownable {
     uint40 public constant MAX_ITEM_ID = type(uint40).max;
     uint216 public constant MAX_TOKEN_ID = type(uint216).max;
 
-    uint256[] itemsRarity;
+    uint8[] itemsRarity;
     uint256[] itemsSupply;
     string[] itemsMetadata;
 
@@ -25,7 +25,7 @@ contract ItemsCollection is ERC721, Ownable {
     constructor() ERC721("Idles", "IDLE") { }
 
     modifier onlyMinters() {
-        require(minters[_msgSender()]);
+        require(minters[_msgSender()], "onlyMinters: only allowed addresses can mint a new item");
         _;
     }
 
@@ -36,13 +36,13 @@ contract ItemsCollection is ERC721, Ownable {
         }
     }
 
-    function addItems(uint256[] memory _itemsRarity, string[] memory _itemsMetadata) external onlyOwner {
+    function addItems(uint8[] memory _itemsRarity, string[] memory _itemsMetadata) external onlyOwner {
         require(_itemsRarity.length > 0, "addItems: rarities length should be greater than 0");
         require(_itemsMetadata.length > 0, "addItems: tokenURIs length should be greater than 0");
         require(_itemsRarity.length == _itemsMetadata.length, "addItems: rarities and tokenURIs should have the same length");
 
         for (uint256 i = 0; i < _itemsRarity.length; i++) {
-            uint256 rarity = _itemsRarity[i];
+            uint8 rarity = _itemsRarity[i];
             string memory metadata = _itemsMetadata[i];
 
             require(rarity >= 0 && rarity <= 4, "addItems: invalidy rarity, it should be between 0 and 4, inclusive");
@@ -66,13 +66,10 @@ contract ItemsCollection is ERC721, Ownable {
         require(_itemId < itemsSupply.length, "mintToken: item doesn't exists");
 
         uint256 newSupply = itemsSupply[_itemId] + 1;
-
         uint256 tokenId = encodeTokenId(_itemId, newSupply);
-
         itemsSupply[_itemId] = newSupply;
 
         super._safeMint(_beneficiary, tokenId);
-
         emit ItemMinted(_beneficiary, _itemId, newSupply);
 
         return tokenId;
@@ -91,7 +88,7 @@ contract ItemsCollection is ERC721, Ownable {
         }
     }
 
-    function getItemsRarity() external view returns (uint256[] memory) {
+    function getItemsRarity() external view returns (uint8[] memory) {
         return itemsRarity;
     }
 

@@ -3,13 +3,18 @@
 */
 
 require('dotenv').config();
-require("@nomiclabs/hardhat-ethers");
+require("@nomiclabs/hardhat-waffle");
 
 const { ALCHEMY_API_URL, ETH_PRIVATE_ADDRESS } = process.env;
 
 module.exports = {
     solidity: "0.8.0",
-    defaultNetwork: "ropsten",
+    settings: {
+        optimizer: {
+            enabled: true,
+            runs: 1,
+        },
+    },
     networks: {
         hardhat: {},
         ropsten: {
