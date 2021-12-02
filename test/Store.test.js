@@ -20,7 +20,7 @@ describe('Store', function () {
         await itemsCollection.addItems([0, 1, 2, 3, 4], ["0:meta", "1:meta", "2:meta", "3:meta", "4:meta"]);
 
         const ChestManager = await ethers.getContractFactory("ChestManager");
-        chestManager = await ChestManager.deploy(itemsCollection.address);
+        chestManager = await ChestManager.deploy(itemsCollection.address, 1);
 
         await chestManager.deployed();
         await chestManager.update([0, 1, 2, 3, 4], [9, 6, 3, 2, 1]);

@@ -1,3 +1,7 @@
+require("dotenv").config()
+
+const { CHEST_MANAGER_SEED } = process.env;
+
 async function main() {
     const itemsCollection = await ethers.getContractFactory("ItemsCollection")
     const deployedItems = await itemsCollection.deploy()
@@ -9,13 +13,13 @@ async function main() {
 
     console.log("Token contract deployed to address:", deployedToken.address)
 
-    const chestCollection = await ethers.getContractFactory("ChestCollection")
-    const deployedChests = await chestCollection.deploy(deployedItems.address)
+    const chestManager = await ethers.getContractFactory("ChestManager")
+    const deployedManager = await chestManager.deploy(deployedItems.address, CHEST_MANAGER_SEED)
 
-    console.log("Chest Collection contract deployed to address:", deployedChests.address)
+    console.log("Chest Collection contract deployed to address:", deployedManager.address)
 
     const store = await ethers.getContractFactory("Store")
-    const deployedStore = await store.deploy(deployedToken.address, deployedChests.address)
+    const deployedStore = await store.deploy(deployedToken.address, deployedManager.address, deployedItems.address)
 
     console.log("Store contract deployed to address:", deployedStore.address)
 }

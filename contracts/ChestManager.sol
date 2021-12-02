@@ -34,9 +34,9 @@ contract ChestManager is Ownable {
     Counters.Counter private chestIds;
     Randoms.Random private random;
 
-    constructor(address _itemsAddress) {
+    constructor(address _itemsAddress, uint64 _seed) {
         itemsCollection = ItemsCollection(_itemsAddress);
-        random.seed(0x7f22053fa5327340);
+        random.seed(_seed);
     }
 
     function update(uint256[] memory _itemIds, uint256[] memory _rarityWeights)
