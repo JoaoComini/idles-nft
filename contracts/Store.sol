@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 import "./IdlesToken.sol";
-import "./ChestCollection.sol";
+import "./ChestManager.sol";
 import "./ItemsCollection.sol";
 
 contract Store is Ownable {
@@ -15,24 +15,24 @@ contract Store is Ownable {
     uint256 public constant CHEST_VALUE = 50 * 10**18;
 
     IdlesToken private token;
-    ChestCollection private chestCollection;
+    ChestManager private chestManager;
     ItemsCollection private itemsCollection;
 
     constructor(address _tokenAddress, address _chestAddress, address _itemsAddress) {
         token = IdlesToken(_tokenAddress);
-        chestCollection = ChestCollection(_chestAddress);
+        chestManager = ChestManager(_chestAddress);
         itemsCollection = ItemsCollection(_itemsAddress);
     }
 
-    function buyChest(uint256 _chestId) external {
+    function buyChest() external {
         address sender = _msgSender();
-
         require(token.balanceOf(sender) >= CHEST_VALUE, "buyChest: sender doesn't have enough tokens");
 
-        uint256 itemId = chestCollection.open(_chestId);
+        uint256 itemId = chestManager.open();
 
         token.transferFrom(sender, owner(), CHEST_VALUE);
 
         itemsCollection.mintItem(sender, itemId);
     }
+
 }
