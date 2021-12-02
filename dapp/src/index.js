@@ -1,15 +1,18 @@
+import './index.css';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-import { Web3ReactProvider } from '@web3-react/core'
+import App from './App';
 
-const { createAlchemyWeb3 } = require("@alch/alchemy-web3");
+import { Web3ReactProvider } from '@web3-react/core'
+import { web3 } from './provider';
 
 function getLibrary(provider, connector) {
-    return createAlchemyWeb3("https://eth-ropsten.alchemyapi.io/v2/mozyuTglwupB4dE72XdBxrHXDbE_l_Bo", { writeProvider: provider});
+    web3.setWriteProvider(provider);
+
+    return web3;
 }
 
 ReactDOM.render(

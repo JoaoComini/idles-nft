@@ -9,15 +9,10 @@ const { ALCHEMY_API_URL, ETH_PRIVATE_ADDRESS } = process.env;
 
 module.exports = {
     solidity: "0.8.0",
-    settings: {
-        optimizer: {
-            enabled: true,
-            runs: 1,
-        },
-    },
+    settings: {},
     networks: {
         hardhat: {},
-        ropsten: {
+        kovan: {
             url: ALCHEMY_API_URL,
             accounts: [`0x${ETH_PRIVATE_ADDRESS}`]
         }
