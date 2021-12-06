@@ -4,23 +4,31 @@ import { Box, Text, Button } from '@chakra-ui/react'
 import { useWeb3React } from '@web3-react/core';
 
 import { idlesToken } from '../contracts/IdlesToken';
+import { itemsCollection } from '../contracts/ItemsCollection';
 import { store } from '../contracts/Store';
 
 function Game() {
     const { account, library } = useWeb3React()
 
     const [balance, setBalance] = useState(0);
+    const [items, setItems] = useState(0);
 
     const getBalance = useCallback(async () => {
         setBalance(await idlesToken.methods.balanceOf(account).call());
-    }, [account, library.eth]);
+    }, [account]);
+
+    const getItems = useCallback(async () => {
+        console.log(await itemsCollection.methods.balanceOf(account).call());
+        setItems(await itemsCollection.methods.balanceOf(account).call());
+    }, [account]);
 
     useEffect(() => {
         getBalance();
-    }, [balance, getBalance])
+        getItems();
+    }, [getBalance, getItems]);
 
     const formatedBalance = () => {
-        return library.utils.fromWei(balance.toString())
+        return library.utils.fromWei(balance.toString());
     };
 
     const handleClick = async () => {
@@ -37,6 +45,9 @@ function Game() {
 
     return (
         <Box>
+            <Text color="white" fontSize="md">
+                {items} Items
+            </Text>
             <Text color="white" fontSize="md">
                 {formatedBalance()} IDLE
             </Text>
