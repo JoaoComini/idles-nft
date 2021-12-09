@@ -5,11 +5,11 @@ import { injected } from '../provider';
 
 function Home() {
 
-    const { activate } = useWeb3React()
+    const { activate } = useWeb3React();
 
     const handleClick = () => {
         activate(injected);
-    }
+    };
 
     return (
         <Flex

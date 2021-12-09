@@ -9,9 +9,7 @@ import App from './App';
 import { Web3ReactProvider } from '@web3-react/core'
 import { web3 } from './provider';
 
-function getLibrary(provider, connector) {
-    web3.setWriteProvider(provider);
-
+function getLibrary() {
     return web3;
 }
 

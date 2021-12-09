@@ -49,7 +49,11 @@ function Store({isOpen, onClose}) {
                 <ModalBody>
                     <VStack>
                         <Square size='256px' bg='gray.200'></Square>
-                        <Button onClick={handleBuy}>Buy</Button>
+                        {
+                            allowed
+                                ? <Button onClick={handleBuy}>Buy</Button>
+                                : <Button onClick={handleApproval}>Approve</Button>
+                        }
                     </VStack>
                 </ModalBody>
             </ModalContent>

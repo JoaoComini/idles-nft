@@ -11,7 +11,9 @@ module.exports = {
     solidity: "0.8.0",
     settings: {},
     networks: {
-        hardhat: {},
+        hardhat: {
+            chainId: 1337
+        },
         kovan: {
             url: ALCHEMY_API_URL,
             accounts: [`0x${ETH_PRIVATE_ADDRESS}`]
